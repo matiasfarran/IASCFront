@@ -1,20 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import {getAllLists} from './api/lists'
 
 function App() {
-  const url = 'http://localhost:4000/lists'
+
+  const [lists, setLists] = useState()
+
   const fetchApi = async() => {
     
-    const response = getAllLists()
-    console.log(response)
+    let lists = await getAllLists()
+    console.log(lists)
+    setLists(lists)
   }
   useEffect( () =>{
     fetchApi()
   }, [])
   return (
     <div className="App">
-      **** {url} ****
+      **** Inicio ****
+      {!lists ? 'cargandooo...' :
+      lists.map( ( list, index) => {
+        return <li>{list.name}</li>
+      })}
     </div>
   );
 }
