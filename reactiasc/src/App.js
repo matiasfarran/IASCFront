@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import './App.css';
-import {getAllLists} from './api/lists'
+import { getAllLists, createList } from './api/lists'
 import {getAllTasksOf} from './api/task'
-import {Table, TableContainer, TableHead, TableCell, TableBody, TableRow, Modal, Button, TextField} from '@material-ui/core';
+import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField} from '@material-ui/core';
 import {Edit, Delete} from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
@@ -30,21 +30,44 @@ function App() {
   const styles= useStyles();
   const [lists, setLists] = useState()
   const [tasks, setTasks] = useState()
+  const [modalInsertar, setModalInsertar]=useState(false);
+  const [modalShowList, setMmdalShowList]=useState(false);
+  const [listSelected, setlistSelected]=useState({name : ''});
+  const [tasksOfListSelected, setTasksOfListSelected]=useState();
 
+  const editList =async(list)=>{
+    setlistSelected(list);
+    setTasksOfListSelected(await getAllTasksOf(list.name))
+    showModalViewList()
+    console.log(tasksOfListSelected)
+  }
 
+  const postList=async()=>{
+    let newLists = lists.concat(listSelected);
+    setLists(newLists);
+    abrirCerrarModalInsertar();
+    await createList(listSelected);
+  }
+
+  const handleChange=e=>{
+    const {name, value}=e.target;
+    setlistSelected({ [name] : value});
+  }
+  
+  const abrirCerrarModalInsertar=()=>{
+    setModalInsertar(!modalInsertar);
+  }
+  const showModalViewList=()=>{
+    setMmdalShowList(!modalShowList);
+  }
   const fetchApi = async() => {
     
     let lists = await getAllLists()
     setLists(lists)
     lists.forEach( async element => {
 
-      let tasksApi = await  getAllTasksOf(element.name);
-      const concatenated = !tasks ? tasksApi : tasks.concat(tasksApi);
-
-      console.log('tareas desde la api:'+tasksApi);
-      console.log('tareas desde el estado:'+tasks);
-      console.log('tareas desde el concat:'+concatenated);
-
+      let tasksApi = await getAllTasksOf(element.name);
+      //const concatenated = !tasks ? tasksApi : tasks.concat(tasksApi);
       setTasks(!tasks ? tasksApi : tasks.concat(tasksApi));
     });
     
@@ -56,14 +79,7 @@ function App() {
   return (
     <div className="App">
       <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Acciones</TableCell>
-                  </TableRow>
-                </TableHead>
-              </Table>
+             Lists:<br />
               <TableBody>
       {!lists ? 'cargandooo...' :
       lists.map( ( list, index) => {
@@ -72,7 +88,7 @@ function App() {
             <TableRow key={list.name}>
               <TableCell>{list.name}</TableCell>
               <TableCell>
-                <Edit className={styles.iconos} onClick={()=>console.log(list)}/>
+                <Edit className={styles.iconos} onClick={()=>editList(list)}/>
                 &nbsp;&nbsp;&nbsp;
                 <Delete  className={styles.iconos} onClick={()=>console.log(list)}/>
                 </TableCell>
@@ -80,10 +96,58 @@ function App() {
          </>
         )
       })}
-      <Button onClick={()=>console.log('asd')}>Insertar</Button>
+      <Button onClick={()=>abrirCerrarModalInsertar()}>Insertar</Button>
       </TableBody>
       </TableContainer><br /><br /><br />
+
+
+      <Modal open={modalInsertar} onClose={abrirCerrarModalInsertar}>
+        <div className={styles.modal}> 
+        <h3>Add new list</h3>
+        <TextField name="name" className={styles.inputMaterial} label="Nombre" onChange={handleChange}/>
+        <br /><br />
+        <div align="right">
+          <Button color="primary" onClick={()=>postList()}>Insertar</Button>
+          <Button onClick={()=>abrirCerrarModalInsertar()}>Cancelar</Button>
+        </div>
+      </div>
+     </Modal>
+
+     <Modal open={modalShowList} onClose={showModalViewList}>
+        <div className={styles.modal}> 
+        
+        <TableContainer>
+          {listSelected.name} Tasks:
+          <TableBody>
+          {!tasksOfListSelected ? 'cargandooo...' :
+            tasksOfListSelected.map( ( task, index) => {
+              return (
+                <>
+                  <TableRow key={task.id}>
+                    <TableCell>{task.id}</TableCell>
+                    <TableCell>{task.text}</TableCell>
+                    <TableCell>{task.mark}</TableCell>
+                    <TableCell>
+                      <Edit className={styles.iconos} onClick={()=>editList(task)}/>
+                      &nbsp;&nbsp;&nbsp;
+                      <Delete  className={styles.iconos} onClick={()=>console.log(task)}/>
+                      </TableCell>
+                  </TableRow>             
+              </>
+              )
+            })}
           
+          </TableBody>
+        </TableContainer>
+
+        <br /><br />
+        <div align="right">
+          <Button color="primary" onClick={()=>postList()}>Insertar</Button>
+          <Button onClick={()=>showModalViewList()}>Cancelar</Button>
+        </div>
+      </div>
+     </Modal>
+
     </div>
   );
 }
