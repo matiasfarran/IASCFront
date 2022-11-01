@@ -3,8 +3,9 @@ import {makeStyles} from '@material-ui/core/styles';
 import './App.css';
 import { getAllLists, createList } from './api/lists'
 import {getAllTasksOf} from './api/task'
-import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField} from '@material-ui/core';
-import {Edit, Delete} from '@material-ui/icons';
+import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField, Checkbox} from '@material-ui/core';
+import {Edit, Delete, Add} from '@material-ui/icons';
+
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -125,8 +126,8 @@ function App() {
                 <>
                   <TableRow key={task.id}>
                     <TableCell>{task.id}</TableCell>
-                    <TableCell>{task.text}</TableCell>
-                    <TableCell>{task.mark}</TableCell>
+                    <TableCell> <TextField name="text" value = {task.text} className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
+                    <TableCell> <Checkbox name="mark" checked={task.mark = 'unchecked'? false :true}  className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
                     <TableCell>
                       <Edit className={styles.iconos} onClick={()=>editList(task)}/>
                       &nbsp;&nbsp;&nbsp;
@@ -136,7 +137,14 @@ function App() {
               </>
               )
             })}
-          
+            <TableRow key='new'>
+              <TableCell><TextField name="id" disabled className={styles.inputMaterial} label="id" onChange={handleChange}/></TableCell>
+                <TableCell><TextField name="text" className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
+                <TableCell><Checkbox name="mark" className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
+                <TableCell>
+                  <Add className={styles.iconos} onClick={()=>console.log('onClick')}/>
+                </TableCell>
+              </TableRow>  
           </TableBody>
         </TableContainer>
 
