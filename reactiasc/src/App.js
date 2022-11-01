@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import './App.css';
 import { getAllLists, createList } from './api/lists'
-import {getAllTasksOf} from './api/task'
+import {getAllTasksOf, createTask} from './api/task'
 import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField, Checkbox} from '@material-ui/core';
 import {Edit, Delete, Add} from '@material-ui/icons';
 
@@ -35,12 +35,19 @@ function App() {
   const [modalShowList, setMmdalShowList]=useState(false);
   const [listSelected, setlistSelected]=useState({name : ''});
   const [tasksOfListSelected, setTasksOfListSelected]=useState();
+  const [tasksToAdd, setTasksToAdd]=useState();
+
+  const onClickAdd = async()=>{
+    let newListsOfTasks = tasksOfListSelected.concat(tasksToAdd);
+    setTasksOfListSelected(newListsOfTasks);
+    showModalViewList();
+    await createTask(listSelected, tasksToAdd);
+  }
 
   const editList =async(list)=>{
     setlistSelected(list);
     setTasksOfListSelected(await getAllTasksOf(list.name))
     showModalViewList()
-    console.log(tasksOfListSelected)
   }
 
   const postList=async()=>{
@@ -53,6 +60,10 @@ function App() {
   const handleChange=e=>{
     const {name, value}=e.target;
     setlistSelected({ [name] : value});
+  }
+  const handleChangeTask=e=>{
+    const {name, value}=e.target;
+    setTasksToAdd({ [name] : value});
   }
   
   const abrirCerrarModalInsertar=()=>{
@@ -91,7 +102,6 @@ function App() {
               <TableCell>
                 <Edit className={styles.iconos} onClick={()=>editList(list)}/>
                 &nbsp;&nbsp;&nbsp;
-                <Delete  className={styles.iconos} onClick={()=>console.log(list)}/>
                 </TableCell>
             </TableRow>             
          </>
@@ -138,11 +148,11 @@ function App() {
               )
             })}
             <TableRow key='new'>
-              <TableCell><TextField name="id" disabled className={styles.inputMaterial} label="id" onChange={handleChange}/></TableCell>
-                <TableCell><TextField name="text" className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
-                <TableCell><Checkbox name="mark" className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
+              <TableCell><TextField name="id" disabled className={styles.inputMaterial} label="id" onChange={handleChangeTask}/></TableCell>
+                <TableCell><TextField name="text" className={styles.inputMaterial} label="Nombre" onChange={handleChangeTask}/></TableCell>
+                <TableCell><Checkbox name="mark" disabled className={styles.inputMaterial} label="Nombre" onChange={handleChangeTask}/></TableCell>
                 <TableCell>
-                  <Add className={styles.iconos} onClick={()=>console.log('onClick')}/>
+                  <Add className={styles.iconos} onClick={()=>onClickAdd()}/>
                 </TableCell>
               </TableRow>  
           </TableBody>

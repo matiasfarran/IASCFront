@@ -5,3 +5,8 @@ export const getAllTasksOf= async (list) => {
     res.data.forEach((task) => {task.list = list});
     return res.data;
 }
+
+export const createTask= async (list, task) => {
+    const res = await httpClient.post('/lists/'+list.name+'/tasks', task)
+    return res.data;
+}
