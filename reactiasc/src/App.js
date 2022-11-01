@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import './App.css';
 import { getAllLists, createList } from './api/lists'
-import {getAllTasksOf, createTask, deleteTask, checkTask, unCheckTask} from './api/task'
+import {getAllTasksOf, createTask, deleteTask, checkTask, unCheckTask, updateTask} from './api/task'
 import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField, Checkbox} from '@material-ui/core';
-import {Edit, Delete, Add} from '@material-ui/icons';
+import {Edit, Delete, Add, Check} from '@material-ui/icons';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -36,9 +36,15 @@ function App() {
   const [listSelected, setlistSelected]=useState({name : ''});
   const [tasksOfListSelected, setTasksOfListSelected]=useState();
   const [tasksToAdd, setTasksToAdd]=useState();
+  const [textToUpdate, setTextToUpdate]=useState();
+
+  const editTask= async(task)=>{
+    task.text = textToUpdate;
+    showModalViewList()
+    updateTask(listSelected, task)
+  }
 
   const handleCheck= async(task)=>{
-    console.log(task)
     showModalViewList()
     if(task.mark == 'checked')
       unCheckTask(listSelected, task)
@@ -54,8 +60,8 @@ function App() {
   }
   
   const deleteTaskOnClick =async(task)=>{
-    deleteTask(listSelected, task)
     showModalViewList()
+    deleteTask(listSelected, task)
   }
   const editList =async(list)=>{
     setlistSelected(list);
@@ -73,6 +79,10 @@ function App() {
   const handleChange=e=>{
     const {name, value}=e.target;
     setlistSelected({ [name] : value});
+  }
+  const handleChangeText=e=>{
+    const {name, value}=e.target;
+    setTextToUpdate(value);
   }
   const handleChangeTask=e=>{
     const {name, value}=e.target;
@@ -105,7 +115,7 @@ function App() {
     <div className="App">
       <TableContainer>
       <h3>Lists:</h3><br />
-              <TableBody>
+      <TableBody>
       {!lists ? 'cargandooo...' :
       lists.map( ( list, index) => {
         return (
@@ -149,10 +159,10 @@ function App() {
                 <>
                   <TableRow key={task.id}>
                     <TableCell>{task.id}</TableCell>
-                    <TableCell> <TextField name="text" value = {task.text} className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
+                    <TableCell> <TextField name="text" value = {task.text} className={styles.inputMaterial} label="Texto" onChange={handleChangeText}/></TableCell>
                     <TableCell> <Checkbox name="mark" checked={task.mark == 'unchecked'? false :true}  className={styles.inputMaterial}  onClick={()=>handleCheck(task)}/></TableCell>
                     <TableCell>
-                      <Edit className={styles.iconos} onClick={()=>editList(task)}/>
+                      <Check className={styles.iconos} onClick={()=>editTask(task)}/>
                       &nbsp;&nbsp;&nbsp;
                       <Delete  className={styles.iconos} onClick={()=>deleteTaskOnClick(task)}/>
                       </TableCell>
@@ -162,8 +172,8 @@ function App() {
             })}
             <TableRow key='new'>
               <TableCell><TextField name="id" disabled className={styles.inputMaterial} label="id" onChange={handleChangeTask}/></TableCell>
-                <TableCell><TextField name="text" className={styles.inputMaterial} label="Nombre" onChange={handleChangeTask}/></TableCell>
-                <TableCell><Checkbox name="mark" disabled className={styles.inputMaterial} label="Nombre" onChange={handleChangeTask}/></TableCell>
+                <TableCell><TextField name="text" className={styles.inputMaterial} label="Texto" onChange={handleChangeTask}/></TableCell>
+                <TableCell><Checkbox name="mark" disabled className={styles.inputMaterial} label="Check" onChange={handleChangeTask}/></TableCell>
                 <TableCell>
                   <Add className={styles.iconos} onClick={()=>onClickAdd()}/>
                 </TableCell>
