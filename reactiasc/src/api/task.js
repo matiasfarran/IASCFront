@@ -10,3 +10,8 @@ export const createTask= async (list, task) => {
     const res = await httpClient.post('/lists/'+list.name+'/tasks', task)
     return res.data;
 }
+
+export const deleteTask= async (list, task) => {
+    const res = await httpClient.delete('/lists/'+list.name+'/tasks/'+ task.id)
+    return res.data;
+}

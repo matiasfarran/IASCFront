@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import './App.css';
 import { getAllLists, createList } from './api/lists'
-import {getAllTasksOf, createTask} from './api/task'
+import {getAllTasksOf, createTask, deleteTask} from './api/task'
 import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField, Checkbox} from '@material-ui/core';
 import {Edit, Delete, Add} from '@material-ui/icons';
 
@@ -43,7 +43,11 @@ function App() {
     showModalViewList();
     await createTask(listSelected, tasksToAdd);
   }
-
+  
+  const deleteTaskOnClick =async(task)=>{
+    deleteTask(listSelected, task)
+    showModalViewList()
+  }
   const editList =async(list)=>{
     setlistSelected(list);
     setTasksOfListSelected(await getAllTasksOf(list.name))
@@ -141,7 +145,7 @@ function App() {
                     <TableCell>
                       <Edit className={styles.iconos} onClick={()=>editList(task)}/>
                       &nbsp;&nbsp;&nbsp;
-                      <Delete  className={styles.iconos} onClick={()=>console.log(task)}/>
+                      <Delete  className={styles.iconos} onClick={()=>deleteTaskOnClick(task)}/>
                       </TableCell>
                   </TableRow>             
               </>
@@ -160,7 +164,7 @@ function App() {
 
         <br /><br />
         <div align="right">
-          <Button color="primary" onClick={()=>postList()}>Insertar</Button>
+          
           <Button onClick={()=>showModalViewList()}>Cancelar</Button>
         </div>
       </div>
