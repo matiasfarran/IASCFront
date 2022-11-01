@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import './App.css';
 import { getAllLists, createList } from './api/lists'
-import {getAllTasksOf, createTask, deleteTask} from './api/task'
+import {getAllTasksOf, createTask, deleteTask, checkTask, unCheckTask} from './api/task'
 import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField, Checkbox} from '@material-ui/core';
 import {Edit, Delete, Add} from '@material-ui/icons';
 
@@ -36,6 +36,15 @@ function App() {
   const [listSelected, setlistSelected]=useState({name : ''});
   const [tasksOfListSelected, setTasksOfListSelected]=useState();
   const [tasksToAdd, setTasksToAdd]=useState();
+
+  const handleCheck= async(task)=>{
+    console.log(task)
+    showModalViewList()
+    if(task.mark == 'checked')
+      unCheckTask(listSelected, task)
+    else 
+      checkTask(listSelected, task)
+  }
 
   const onClickAdd = async()=>{
     let newListsOfTasks = tasksOfListSelected.concat(tasksToAdd);
@@ -95,7 +104,7 @@ function App() {
   return (
     <div className="App">
       <TableContainer>
-             Lists:<br />
+      <h3>Lists:</h3><br />
               <TableBody>
       {!lists ? 'cargandooo...' :
       lists.map( ( list, index) => {
@@ -141,7 +150,7 @@ function App() {
                   <TableRow key={task.id}>
                     <TableCell>{task.id}</TableCell>
                     <TableCell> <TextField name="text" value = {task.text} className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
-                    <TableCell> <Checkbox name="mark" checked={task.mark = 'unchecked'? false :true}  className={styles.inputMaterial} label="Nombre" onChange={handleChange}/></TableCell>
+                    <TableCell> <Checkbox name="mark" checked={task.mark == 'unchecked'? false :true}  className={styles.inputMaterial}  onClick={()=>handleCheck(task)}/></TableCell>
                     <TableCell>
                       <Edit className={styles.iconos} onClick={()=>editList(task)}/>
                       &nbsp;&nbsp;&nbsp;
