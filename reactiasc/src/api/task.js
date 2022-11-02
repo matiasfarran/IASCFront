@@ -27,3 +27,7 @@ export const updateTask= async (list, task) => {
     const res = await httpClient.put('/lists/'+list.name+'/tasks/'+ task.id, {text : task.text})
     return res.data;
 }
+export const swapTask= async (fromList, toList, task) => {
+    const res = await httpClient.put('/lists/'+fromList.name+'/swaps/tasks/', {task_id : task.id, end_list: toList})
+    return res.data;
+}

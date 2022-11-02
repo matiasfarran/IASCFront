@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import './App.css';
 import { getAllLists, createList } from './api/lists'
-import {getAllTasksOf, createTask, deleteTask, checkTask, unCheckTask, updateTask} from './api/task'
-import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField, Checkbox} from '@material-ui/core';
+import {getAllTasksOf, createTask, deleteTask, checkTask, unCheckTask, updateTask, swapTask} from './api/task'
+import { TableContainer,  TableCell, TableBody, TableRow, Modal, Button, TextField, Checkbox, Select, MenuItem} from '@material-ui/core';
 import {Edit, Delete, Add, Check} from '@material-ui/icons';
 
 
 const useStyles = makeStyles((theme) => ({
   modal: {
     position: 'absolute',
-    width: 400,
+    width: 1000,
     backgroundColor: theme.palette.background.paper,
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
@@ -37,7 +37,12 @@ function App() {
   const [tasksOfListSelected, setTasksOfListSelected]=useState();
   const [tasksToAdd, setTasksToAdd]=useState();
   const [textToUpdate, setTextToUpdate]=useState();
+  const [listToSwapp, setListToSwapp]=useState();
 
+  const handleChangeSelect=async(e, task)=>{
+    showModalViewList()
+    swapTask(listSelected, e.target.value, task)
+  }
   const editTask= async(task)=>{
     task.text = textToUpdate;
     showModalViewList()
@@ -65,6 +70,7 @@ function App() {
   }
   const editList =async(list)=>{
     setlistSelected(list);
+    setListToSwapp(list);
     setTasksOfListSelected(await getAllTasksOf(list.name))
     showModalViewList()
   }
@@ -79,6 +85,7 @@ function App() {
   const handleChange=e=>{
     const {name, value}=e.target;
     setlistSelected({ [name] : value});
+    listToSwapp({ [name] : value});
   }
   const handleChangeText=e=>{
     const {name, value}=e.target;
@@ -165,7 +172,12 @@ function App() {
                       <Check className={styles.iconos} onClick={()=>editTask(task)}/>
                       &nbsp;&nbsp;&nbsp;
                       <Delete  className={styles.iconos} onClick={()=>deleteTaskOnClick(task)}/>
-                      </TableCell>
+                    </TableCell>
+                    <TableCell>
+                      <Select name="list" value = {listSelected.name} className={styles.inputMaterial} label="List" onChange={e => {handleChangeSelect(e, task)}}>
+                          {lists.map( ( list, i) => {return (<MenuItem value={list.name}>{list.name}</MenuItem>)})}
+                      </Select>
+                    </TableCell>
                   </TableRow>             
               </>
               )
