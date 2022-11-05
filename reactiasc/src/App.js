@@ -87,9 +87,11 @@ function App() {
     setlistSelected({ [name] : value});
     listToSwapp({ [name] : value});
   }
-  const handleChangeText=e=>{
+  const handleChangeText=(e, task)=>{
     const {name, value}=e.target;
     setTextToUpdate(value);
+    console.log(this);
+    task.text =value;
   }
   const handleChangeTask=e=>{
     const {name, value}=e.target;
@@ -166,7 +168,7 @@ function App() {
                 <>
                   <TableRow key={task.id}>
                     <TableCell>{task.id}</TableCell>
-                    <TableCell> <TextField name="text" value = {task.text} className={styles.inputMaterial} label="Texto" onChange={handleChangeText}/></TableCell>
+                    <TableCell> <TextField name="text" value = {task.text} className={styles.inputMaterial} label="Texto" onChange={(e) => {handleChangeText(e, task)}}/></TableCell>
                     <TableCell> <Checkbox name="mark" checked={task.mark == 'unchecked'? false :true}  className={styles.inputMaterial}  onClick={()=>handleCheck(task)}/></TableCell>
                     <TableCell>
                       <Check className={styles.iconos} onClick={()=>editTask(task)}/>
